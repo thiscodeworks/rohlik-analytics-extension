@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "Rohlik Analytics",
+    "version": "1.0",
+    "description": "Injects analytics data into Rohlik user account page",
+    "permissions": ["activeTab"],
+    "host_permissions": ["https://www.rohlik.cz/*"],
+    "content_scripts": [
+      {
+        "matches": ["https://www.rohlik.cz/uzivatel/profil"],
+        "js": ["content.js"]
+      }
+    ]
+  }
