@@ -66,10 +66,21 @@ function injectElements() {
     `;
   }
 
+  function updateProgressBar(progress) {
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.style.width = `${progress}%`;
+    progressBar.textContent = `${Math.round(progress)}%`;
+  }
+
   async function generateAnalytics() {
     const analyticsBox = document.getElementById('rohlik-analytics');
     analyticsBox.style.display = 'block';
-    analyticsBox.innerHTML = '<p>Načítání dat analýzy...</p>';
+    analyticsBox.innerHTML = `
+      <h2>Načítání dat analýzy...</h2>
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+    `;
 
     try {
       const response = await fetch('https://www.rohlik.cz/api/v3/orders/delivered?offset=0&limit=1000');
@@ -83,7 +94,10 @@ function injectElements() {
       let deliveredOrdersCount = 0;
       let itemsMap = new Map();
 
-      for (const order of data) {
+      const totalOrders = data.length;
+
+      for (let i = 0; i < data.length; i++) {
+        const order = data[i];
         const orderDetails = await fetchOrderDetails(order.id);
         
         if (orderDetails.state === 'DELIVERED') {
@@ -110,6 +124,8 @@ function injectElements() {
             }
           });
         }
+
+        updateProgressBar((i + 1) / totalOrders * 100);
       }
 
       const sortedItems = Array.from(itemsMap.values());
@@ -128,6 +144,22 @@ function injectElements() {
             padding: 20px;
             background-color: #f5f5f5;
             border-radius: 10px;
+          }
+          .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+          }
+          .progress-bar {
+            width: 0;
+            height: 30px;
+            background-color: #00a651;
+            border-radius: 5px;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            transition: width 0.5s ease-in-out;
           }
           .stat-container {
             display: flex;
